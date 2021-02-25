@@ -23,9 +23,11 @@ dag = DAG(
     schedule_interval='0 18	* *	1,2,3,4,5'  # running from Mon-Fri at 6 PM
 )
 
+
 templated_command="""
         cd $DATAPATH ; mkdir {{ ds }}
 """
+
 t0 = BashOperator(
     task_id='create_data_directory',
     depends_on_past=False,
