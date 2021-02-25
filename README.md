@@ -4,7 +4,6 @@
 * [Technologies](#technologies)
 * [Setup](#setup)
 * [Execution](#execution)
-* [References](#references)
 
 ## General Info
 This project is Apache Airflow mini project
@@ -15,8 +14,14 @@ In this project, we will use Apache Airflow to create a data pipeline to extract
 
 ## Technologies
 Project is created as follows:
+* Docker
+* Python3.7+ (Libraries: yfinance,pandas)
 
-Creating Docker Image
+
+## Setup
+
+* Creating Custom Docker Image
+
 To deploy Airflow with docker the best image to refer is puckel/docker-airflow. But this image can not be used as it is; due to few reasons. One reason is that it does not have all the packages installed that we are using in our project. If we need to change properties in airflow.config file, we have to pass them as environment variables. With a large number of variables this is not easy. So we will be writing a customized Dockerfile with the base image of puckel/docker-airflow. This image is going to be used in all our containers.
 
 
