@@ -1,0 +1,57 @@
+version: '3.7'
+services:
+    postgres:
+        image: postgres:9.6
+        environment:
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
+    
+    webserver:
+        image: webserver:latest
+        build:
+          context: .
+        restart: always
+        depends_on:
+            - postgres
+        environment:
+            - LOAD_EX=n
+            - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+            - EXECUTOR=Local
+            - PYTHONPATH=/usr/local/airflow
+        env_file:
+          - env.list
+        volumes:
+            - ./airflow/dags:/usr/local/airflow/dags
+            - ./scripts:/usr/local/airflow/scripts
+            - ./tmp_data:/usr/local/tmp_data
+            - ./finance_data:/usr/local/finance_data
+        ports:
+            - "8080:8080"
+        command: webserver
+        healthcheck:
+            test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+            interval: 30s
+            timeout: 30s
+            retries: 3
+
+    scheduler:
+        image: scheduler:latest
+        build:
+          context: .
+        restart: always
+        depends_on:
+            - webserver
+        volumes:
+            - ./airflow/dags:/usr/local/airflow/dags
+            - ./scripts:/usr/local/airflow/scripts
+            - ./tmp_data:/usr/local/tmp_data
+            - ./finance_data:/usr/local/finance_data
+        environment:
+            - LOAD_EX=n
+            - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+            - EXECUTOR=Local
+            - PYTHONPATH=/usr/local/airflow
+        command: scheduler
+        env_file:
+          - env.list
