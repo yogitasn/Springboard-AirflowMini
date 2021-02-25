@@ -17,9 +17,10 @@ In this project, we will use Apache Airflow to create a data pipeline to extract
 Project is created as follows:
 
 Creating Docker Image
-To deploy Airflow with docker the best image to refer is puckel/docker-airflow. But this image can not be used as it is; due to few reasons. One reason is that it does not have all the packages installed that we are using in our project. If we need to change properties in airflow.config file, we have to pass them as environment variables. With a large number of variables this is not easy. So we will be writing a customized Dockerfile with the base image of puckel/docker-airflow. This image is going to be used in all our containers except message broker, meta database and worker monitor. 
+To deploy Airflow with docker the best image to refer is puckel/docker-airflow. But this image can not be used as it is; due to few reasons. One reason is that it does not have all the packages installed that we are using in our project. If we need to change properties in airflow.config file, we have to pass them as environment variables. With a large number of variables this is not easy. So we will be writing a customized Dockerfile with the base image of puckel/docker-airflow. This image is going to be used in all our containers.
 
-Following is the Dockerfile.
+
+Following is our customized Dockerfile.
 
 ```
 FROM puckel/docker-airflow:1.10.1
@@ -33,7 +34,7 @@ RUN pip install -r /requirements.txt
 
 ```
 
-docker-compose-LocalExecutor.yml is used to pull the required images for executing our project
+'docker-compose-LocalExecutor.yml' is used to pull the required images for executing our project
 
 ``` 
 version: '3.7'
@@ -79,12 +80,12 @@ webserver:
 
 ```
 
-* build context : point to the created Dockerfile. The correspond image is built when container is starting
+* build context : point to the created custom Dockerfile. The correspond image is built when container is starting
 * restart : re-deploy the container if it is stopped for any reason.
 * depends_on : web server needs to communicate with meta db and message broker containers
 * environment : These are the list environment variables requested by the base image puckel/docker-airflow. Keep them as it is. You are free to add more environment variables like ‘PYTHONPATH’ which are going to be used by your own program scripts.
 * env_file: list of environment variables can be given using file
-* volumes : dags and program scripts can be mounted as volumes. This is more effective than copying files into the Docker image. Once the files are updated changes will be automatically deployed in the web server. No need to build the image and redeploy the container.
+* volumes : dags and program scripts/datafolders can be mounted as volumes. This is more effective than copying files into the Docker image. Once the files are updated changes will be automatically deployed in the web server. No need to build the image and redeploy the container.
 * ports : ports to be deployed on. web server is running on port 8080.
 * command : airflow command to start the web server. This is requested by the base image puckel/docker-airflow. Do not modify it.
 * healthcheck : test to check the health of the container
@@ -103,8 +104,10 @@ docker-compose docker-compose-LocalExecutor.yml up -d --build
 
 Access airflow UI on http:localhost:8080 and trigger DAG
 
-## DataModel
-![Alt text](/Screenshots/airflowebserver.PNG?raw=true "Airflow webserver")
+
+![Alt text](/Screenshots/airflowwebserver.PNG?raw=true "Airflow webserver")
+
+
 
 Some important docker commands
 
