@@ -7,6 +7,10 @@ from scripts.config import FnDATAPATH
 
 class stockData():
 
+    """
+     Function to execute query on the TSLA and AAPL stock data
+
+    """
     @staticmethod
     def execute_query():
         print("Execute a query on the Apple stock finance dataframe and display the results")

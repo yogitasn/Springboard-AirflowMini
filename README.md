@@ -136,5 +136,5 @@ docker exec -it <container-id> bash
 
 ```
 
-
+Please refer document 'Airflow screenshots.docx' for detailed steps on airflow execution and logs.
 

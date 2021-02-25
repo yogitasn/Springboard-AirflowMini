@@ -7,6 +7,10 @@ from scripts.config import DATAPATH
 
 class YfinanceStock():
 
+    """
+     Function to download stock data using yfinance library
+
+    """
     @staticmethod
     def download_stock_data(**kwargs):
         print("Downloading stock data for {}".format(kwargs['symbolType']))
