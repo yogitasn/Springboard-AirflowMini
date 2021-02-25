@@ -4,6 +4,7 @@ from datetime import timedelta,date,datetime
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
+from airflow.operators.dummy_operator import DummyOperator
 from scripts.finance import YfinanceStock
 from scripts.stock import stockData
 
@@ -23,12 +24,11 @@ dag = DAG(
     schedule_interval='0 18	* *	1,2,3,4,5'  # running from Mon-Fri at 6 PM
 )
 
-
 templated_command="""
         cd $DATAPATH ; mkdir {{ ds }}
 """
 
-t0 = BashOperator(
+create_data_directory = BashOperator(
     task_id='create_data_directory',
     depends_on_past=False,
     bash_command=templated_command,
@@ -36,14 +36,14 @@ t0 = BashOperator(
 )
 
 
-t1	= PythonOperator(
-    task_id='download_yahoo_stock', 
+download_tsla_stock = PythonOperator(
+    task_id='download_tsla_stock', 
     python_callable=YfinanceStock.download_stock_data,
     op_kwargs={'symbolType':'tsla'},
     dag=dag)
 
 
-t2	= PythonOperator(
+download_apple_stock = PythonOperator(
     task_id='download_apple_stock', 
     python_callable=YfinanceStock.download_stock_data,
     op_kwargs={'symbolType':'aapl'},
@@ -51,24 +51,44 @@ t2	= PythonOperator(
 
 
 templated_command="""
-        {% for filename in params.filenames %}
-          mv $DATAPATH/{{ ds }}/{{ filename }}  /usr/local/finance_data
-        {% endfor %}
-  """
+    mv $DATAPATH/{{ ds }}/{{ params.filename }}  /usr/local/finance_data
+"""
 
-t3 = BashOperator(
-    task_id='move_files_to_another_loc',
+move_tsla_data_to_diff_location = BashOperator(
+    task_id='move_tsla_data_to_diff_location',
     bash_command=templated_command,
-    params={'filenames': ['data_tsla.csv','data_aapl.csv']},
+    params={'filename': 'data_tsla.csv'},
     dag=dag
 )
 
 
-t4	= PythonOperator(
+move_apple_data_to_diff_location = BashOperator(
+    task_id='move_apple_data_to_diff_location',
+    bash_command=templated_command,
+    params={'filename': 'data_aapl.csv'},
+    dag=dag
+)
+
+connect = DummyOperator(
+    task_id='connect',
+    dag=dag
+)
+
+execute_query_on_data	= PythonOperator(
       task_id='execute_query_on_data', 
       python_callable=stockData.execute_query,
       dag=dag
 )
 
 
-t0 >> t1 >> t2 >> t3 >> t4
+create_data_directory >> [download_tsla_stock,download_apple_stock] 
+
+download_tsla_stock >> move_tsla_data_to_diff_location 
+
+download_apple_stock >> move_apple_data_to_diff_location
+
+move_tsla_data_to_diff_location >> connect
+
+move_apple_data_to_diff_location >> connect 
+
+connect >> execute_query_on_data
