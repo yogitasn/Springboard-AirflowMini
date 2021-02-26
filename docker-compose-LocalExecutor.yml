@@ -26,6 +26,7 @@ services:
             - ./scripts:/usr/local/airflow/scripts
             - ./tmp_data:/usr/local/tmp_data
             - ./finance_data:/usr/local/finance_data
+            - ./airflowlogs:/usr/local/airflow/logs
         ports:
             - "8080:8080"
         command: webserver
@@ -47,6 +48,7 @@ services:
             - ./scripts:/usr/local/airflow/scripts
             - ./tmp_data:/usr/local/tmp_data
             - ./finance_data:/usr/local/finance_data
+            - ./airflowlogs:/usr/local/airflow/logs
         environment:
             - LOAD_EX=n
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
