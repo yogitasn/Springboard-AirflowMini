@@ -54,7 +54,7 @@ templated_command="""
     mv $DATAPATH/{{ ds }}/{{ params.filename }}  /usr/local/finance_data
 """
 
-move_tsla_data_to_diff_location = BashOperator(
+move_tsla_data_to_diff_loc = BashOperator(
     task_id='move_tsla_data_to_diff_location',
     bash_command=templated_command,
     params={'filename': 'data_tsla.csv'},
@@ -62,7 +62,7 @@ move_tsla_data_to_diff_location = BashOperator(
 )
 
 
-move_apple_data_to_diff_location = BashOperator(
+move_apple_data_to_diff_loc = BashOperator(
     task_id='move_apple_data_to_diff_location',
     bash_command=templated_command,
     params={'filename': 'data_aapl.csv'},
@@ -83,12 +83,12 @@ execute_query_on_data	= PythonOperator(
 
 create_data_directory >> [download_tsla_stock,download_apple_stock] 
 
-download_tsla_stock >> move_tsla_data_to_diff_location 
+download_tsla_stock >> move_tsla_data_to_diff_loc
 
-download_apple_stock >> move_apple_data_to_diff_location
+download_apple_stock >> move_apple_data_to_diff_loc
 
-move_tsla_data_to_diff_location >> connect
+move_tsla_data_to_diff_loc >> connect
 
-move_apple_data_to_diff_location >> connect 
+move_apple_data_to_diff_loc >> connect 
 
 connect >> execute_query_on_data
