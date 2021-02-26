@@ -8,7 +8,7 @@ from scripts.config import DATAPATH
 class YfinanceStock():
 
     """
-     Function to download stock data using yfinance library
+     Function to download stock data for tsla and apple using yfinance library
 
     """
     @staticmethod
