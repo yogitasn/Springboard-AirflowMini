@@ -119,7 +119,7 @@ Some important docker commands
 Stop container
 
 ```
-docker-compose docker-compose-LocalExecutor.yml down
+docker-compose -f docker-compose-LocalExecutor.yml down
 
 ```
 View container
