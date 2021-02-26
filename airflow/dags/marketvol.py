@@ -29,8 +29,7 @@ templated_command="""
         cd $DATAPATH ; mkdir {{ ds }}
 """
 
-
-create_data_dir = BashOperator(
+create_data_directory = BashOperator(
     task_id='create_data_directory',
     depends_on_past=False,
     bash_command=templated_command,
@@ -83,7 +82,7 @@ execute_query_on_data	= PythonOperator(
 )
 
 
-create_data_dir >> [download_tsla_stock,download_apple_stock] 
+create_data_directory >> [download_tsla_stock,download_apple_stock] 
 
 download_tsla_stock >> move_tsla_data_to_diff_loc
 
