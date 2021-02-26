@@ -24,11 +24,13 @@ dag = DAG(
     schedule_interval='0 18	* *	1,2,3,4,5'  # running from Mon-Fri at 6 PM
 )
 
+
 templated_command="""
         cd $DATAPATH ; mkdir {{ ds }}
 """
 
-create_data_directory = BashOperator(
+
+create_data_dir = BashOperator(
     task_id='create_data_directory',
     depends_on_past=False,
     bash_command=templated_command,
@@ -81,7 +83,7 @@ execute_query_on_data	= PythonOperator(
 )
 
 
-create_data_directory >> [download_tsla_stock,download_apple_stock] 
+create_data_dir >> [download_tsla_stock,download_apple_stock] 
 
 download_tsla_stock >> move_tsla_data_to_diff_loc
 
