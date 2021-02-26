@@ -8,7 +8,7 @@ from scripts.config import FnDATAPATH
 class stockData():
 
     """
-     Function to execute query on the TSLA and AAPL stock data
+     Function to read dataframe and execute query on the TSLA and AAPL stock data
 
     """
     @staticmethod
