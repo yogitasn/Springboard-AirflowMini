@@ -12,10 +12,13 @@ class stockData():
 
     """
     @staticmethod
-    def execute_query():
+    def execute_query(**kwargs):
         print("Execute a query on the Apple stock finance dataframe and display the results")
+        
+        execution_date=kwargs['ds']
+        print(execution_date)
               
-        df_aapl=pd.read_csv("{}/finance_data/data_aapl.csv".format(FnDATAPATH))
+        df_aapl=pd.read_csv("{}/finance_data/{}/data_aapl.csv".format(FnDATAPATH,execution_date))
 
         print(df_aapl.query('Volume < 500000'))
 
@@ -23,7 +26,7 @@ class stockData():
 
         print("Execute a query on the TSLA stock finance dataframe and display the results")
               
-        df_tsla=pd.read_csv("{}/finance_data/data_tsla.csv".format(FnDATAPATH))
+        df_tsla=pd.read_csv("{}/finance_data/{}/data_tsla.csv".format(FnDATAPATH,execution_date))
 
         print(df_tsla.query('Volume < 300000'))
 

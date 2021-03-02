@@ -8,10 +8,11 @@ from airflow.operators.dummy_operator import DummyOperator
 from scripts.finance import YfinanceStock
 from scripts.stock import stockData
 
+
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2021, 2, 25),
+    'start_date': datetime(2021,2,28),
     'retries': 2,
     'retry_delay': timedelta(minutes=5)
 }
@@ -21,12 +22,13 @@ dag = DAG(
     'marketvol',
     default_args=default_args,
     description='A simple DAG',
-    schedule_interval='0 18	* *	1,2,3,4,5'  # running from Mon-Fri at 6 PM
+    #schedule_interval='0 18	* *	1,2,3,4,5'  # running from Mon-Fri at 6 PM
+    schedule_interval='0 18	* *	*'  # running from Mon-Fri at 6 PM
 )
 
 
 templated_command="""
-        cd $DATAPATH ; mkdir {{ ds }}
+        cd $DATAPATH ; mkdir {{ ds }} ; cd .. ; cd finance_data ; mkdir {{ ds }}
 """
 
 create_data_directory = BashOperator(
@@ -36,11 +38,13 @@ create_data_directory = BashOperator(
     dag=dag
 )
 
+today= "{{ ds }}"
 
 download_tsla_stock = PythonOperator(
     task_id='download_tsla_stock', 
     python_callable=YfinanceStock.download_stock_data,
     op_kwargs={'symbolType':'tsla'},
+    provide_context=True,
     dag=dag)
 
 
@@ -48,11 +52,12 @@ download_apple_stock = PythonOperator(
     task_id='download_apple_stock', 
     python_callable=YfinanceStock.download_stock_data,
     op_kwargs={'symbolType':'aapl'},
+    provide_context=True,
     dag=dag)
 
 
 templated_command="""
-    mv $DATAPATH/{{ ds }}/{{ params.filename }}  /usr/local/finance_data
+    mv $DATAPATH/{{ ds }}/{{ params.filename }}  /usr/local/finance_data/{{ ds }}
 """
 
 move_tsla_data_to_diff_loc = BashOperator(
@@ -78,6 +83,7 @@ connect = DummyOperator(
 execute_query_on_data	= PythonOperator(
       task_id='execute_query_on_data', 
       python_callable=stockData.execute_query,
+      provide_context=True,
       dag=dag
 )
 
